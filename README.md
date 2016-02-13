@@ -32,7 +32,7 @@ fn.raw(d, 10, [2, 3/10]); // d(30)
 
  where `d` is a [`toDecimal`](https://github.com/javiercejudo/to-decimal) with at least `times` and `pow`.
 
- ## Use case: functional hex to dec
+## Use case: functional hex to dec
 
 ```js
 var R = require('ramda');
