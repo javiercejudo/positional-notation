@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/javiercejudo/positional-notation/badge.svg?branch=master)](https://coveralls.io/r/javiercejudo/positional-notation?branch=master)
 [![Code Climate](https://codeclimate.com/github/javiercejudo/positional-notation/badges/gpa.svg)](https://codeclimate.com/github/javiercejudo/positional-notation)
 
-Converts a string `hh:mm:ss` to seconds
+Calculate the decimal equivalent given a base, a position and a decimal value
 
 ## Install
 
