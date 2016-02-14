@@ -36,6 +36,7 @@ describe('positional notation', function() {
     var d = toDecimalFactory(Decimal);
 
     fn.raw(d, 60, [1, 32]).equals(d(1920)).should.be.exactly(true);
+    fn.raw(d, 60)([1, 32]).equals(d(1920)).should.be.exactly(true);
     fn.raw(d)(60, [1, 32]).equals(d(1920)).should.be.exactly(true);
     fn.raw(d)(60)([1, 32]).equals(d(1920)).should.be.exactly(true);
 
@@ -49,35 +50,69 @@ describe('positional notation', function() {
   });
 });
 
-describe('use case', function() {
-  var symbols = {
-    '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
-    'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15',
+describe('use case: base any to any', function() {
+  var d = toDecimalFactory(Decimal);
+
+  // To avoid large numbers to go into exponential notation
+  Decimal.Impl.E_POS = 45;
+
+  var symbols = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+  var fromBase = function(d, base) {
+    return R.pipe(
+      R.split(''),
+      R.reverse,
+      R.map(R.indexOf(R.__, symbols)),
+      R.addIndex(R.map)(fn.mapper(fn.raw(d, base))),
+      R.reduce(R.invoker(1, 'plus'), d(0))
+    );
   };
 
-  var posNotation = fn(Object.keys(symbols).length);
+  var toBase = function(d, base) {
+    return R.pipe(
+      R.unfold(function(cur) {
+        return cur === '0' ? false : [
+          d(cur).mod(d(base)).toString(),
+          d(cur).div(d(base)).toString().split('.')[0]
+        ];
+      }),
+      R.reverse,
+      R.map(R.nth(R.__, symbols)),
+      R.join('')
+    );
+  };
 
-  var hexToDec = R.pipe(
-    R.toUpper,
-    R.split(''),
-    R.reverse,
-    R.map(R.prop(R.__, symbols)),
-    R.addIndex(R.map)(function(val, index) {
-      return posNotation([index, val]);
-    }),
-    R.sum
-  );
+  var convertBasesRaw = R.curryN(4, function(d, oldBase, newBase, n) {
+    return R.pipe(fromBase(d, oldBase), toBase(d, newBase))(n);
+  });
 
-  it('hexadecimal to decimal', function() {
-    hexToDec('AB').should.be.exactly(171);
+  var convertBases = convertBasesRaw(d);
 
-    // https://github.com/NerdDiffer/all-your-base/blob/ce258b2ca1430dd506b2a9e326f00219e8f8673c/test/convert_spec.js#L73-L79
-    hexToDec('1556').should.be.exactly(5462);
-    hexToDec('AE91').should.be.exactly(44689);
-    hexToDec('512').should.be.exactly(1298);
-    hexToDec('7DE').should.be.exactly(2014);
-    hexToDec('20').should.be.exactly(32);
-    hexToDec('9C4').should.be.exactly(2500);
-    hexToDec('ff001d').should.be.exactly(16711709);
+  it('hexadecimal to binary', function() {
+    var hexToBin = convertBases(16, 2);
+
+    hexToBin('A').should.be.exactly('1010');
+    hexToBin('1E').should.be.exactly('11110');
+  });
+
+  it('large decimal to base 9', function() {
+    convertBases(10, 9, '5678364565345634563456346757364563534534645745')
+      .should.be.exactly('802531310452364303450750087576673257456135727727');
+  });
+
+  it.skip('non-integer decimal to base 9', function() {
+    convertBases(10, 9, '10.10')
+      .should.be.exactly('11.08');
+  });
+
+  it('octal to duodecimal', function() {
+    convertBases(8, 12, '73').should.be.exactly('4B');
+  });
+
+  it('quinary to base 32', function() {
+    var quiToB32 = convertBases(5, 32);
+
+    quiToB32('2312124222213').should.be.exactly('JAVIER');
+    quiToB32('30333330434').should.be.exactly('TAOCP');
   });
 });

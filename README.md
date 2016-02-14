@@ -35,24 +35,22 @@ fn.raw(d, 10, [2, 3/10]); // d(30)
 ## Use case: functional hex to dec
 
 ```js
-var R = require('ramda');
-var fn = require('positional-notation');
+const R = require('ramda');
+const fn = require('positional-notation');
 
-var symbols = {
+const symbols = {
   '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
   'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15',
 };
 
-var posNotation = fn(Object.keys(symbols).length);
+const posNotation = fn(Object.keys(symbols).length);
 
-var hexToDec = R.pipe(
+const hexToDec = R.pipe(
   R.toUpper,
   R.split(''),
   R.reverse,
   R.map(R.prop(R.__, symbols)),
-  R.addIndex(R.map)(function(val, index) {
-    return posNotation([index, val]);
-  }),
+  R.addIndex(R.map)(fn.mapper(posNotation)),
   R.sum
 );
 
