@@ -63,7 +63,7 @@ describe('use case: base any to any', function() {
       R.split(''),
       R.reverse,
       R.map(R.indexOf(R.__, symbols)),
-      R.addIndex(R.map)(fn.mapper(fn.raw(d, base))),
+      R.addIndex(R.map)(fn.mapper(d, base)),
       R.reduce(R.invoker(1, 'plus'), d(0))
     );
   };

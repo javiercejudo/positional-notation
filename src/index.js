@@ -23,8 +23,8 @@ var positionalNotation = curryN(2, pipe(positionalNotationRaw(toDecimal), Number
 
 positionalNotation.raw = positionalNotationRaw;
 
-positionalNotation.mapper = curry3(function(f, val, index) {
-  return f([index, val]);
+positionalNotation.mapper = curryN(4, function(d, base, val, index) {
+  return positionalNotationRaw(d, base, [index, val]);
 });
 
 positionalNotation.unfolder = curry3(function(d, base, cur) {
