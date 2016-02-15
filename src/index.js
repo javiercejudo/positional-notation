@@ -27,4 +27,11 @@ positionalNotation.mapper = curry3(function(f, val, index) {
   return f([index, val]);
 });
 
+positionalNotation.unfolder = curry3(function(d, base, cur) {
+  return cur === '0' ? false : [
+    d(cur).mod(d(base)).toString(),
+    d(cur).div(d(base)).toString().split('.')[0]
+  ];
+});
+
 module.exports = positionalNotation;

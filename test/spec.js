@@ -70,14 +70,9 @@ describe('use case: base any to any', function() {
 
   var toBase = function(d, base) {
     return R.pipe(
-      R.unfold(function(cur) {
-        return cur === '0' ? false : [
-          d(cur).mod(d(base)).toString(),
-          d(cur).div(d(base)).toString().split('.')[0]
-        ];
-      }),
-      R.reverse,
+      R.unfold(fn.unfolder(d, base)),
       R.map(R.nth(R.__, symbols)),
+      R.reverse,
       R.join('')
     );
   };
