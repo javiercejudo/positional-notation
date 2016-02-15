@@ -1,6 +1,6 @@
 {
   "name": "positional-notation",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Calculate the decimal equivalent given a base, a position and a decimal value",
   "main": "src/index.js",
   "scripts": {
